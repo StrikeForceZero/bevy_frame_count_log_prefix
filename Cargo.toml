@@ -9,6 +9,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 tracing-subscriber = "0.3"
+tracing-log = "0.2"
 
 [dependencies.bevy]
 version = "0.13"
