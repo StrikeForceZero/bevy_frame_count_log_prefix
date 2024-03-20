@@ -1,4 +1,5 @@
 use crate::cache_system::cache_frame_count;
+use crate::config::FrameCountSubscriberConfig;
 use crate::formatter::FrameCounterPrefixFormatter;
 use bevy::core::FrameCount;
 use bevy::log::LogPlugin;
@@ -13,7 +14,7 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::registry::LookupSpan;
 use tracing_subscriber::{EnvFilter, Registry};
 
-pub(crate) fn register_subscriber() {
+pub(crate) fn register_subscriber(config: Option<&FrameCountSubscriberConfig>) {
     /// derived from https://github.com/bevyengine/bevy/blob/dedf66f72bd8659b744e12b341a7f8de4ed8ba17/crates/bevy_log/src/lib.rs#L129-L228 (MIT/APACHE)
     let finished_subscriber;
     let default_log_plugin = LogPlugin::default();
@@ -26,8 +27,13 @@ pub(crate) fn register_subscriber() {
     let subscriber = Registry::default().with(filter_layer);
 
     // create format layer and replace event_formatter with frame count injector
+    let mut frame_counter_prefix_formatter = FrameCounterPrefixFormatter::default();
+    if let Some(config) = config {
+        frame_counter_prefix_formatter
+            .set_frame_count_prefix_formatter(config.get_frame_count_prefix_formatter());
+    }
     let fmt_layer = tracing_subscriber::fmt::Layer::default()
-        .event_format(FrameCounterPrefixFormatter::default())
+        .event_format(frame_counter_prefix_formatter)
         .with_writer(std::io::stderr);
 
     let subscriber = subscriber.with(fmt_layer);

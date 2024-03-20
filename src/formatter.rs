@@ -16,6 +16,19 @@ pub(crate) struct FrameCounterPrefixFormatter {
     main_formatter: format::Format<format::Full>,
 }
 
+impl FrameCounterPrefixFormatter {
+    pub(crate) fn set_frame_count_prefix_formatter(
+        &mut self,
+        formatter: Option<FrameCountPrefixFormatter>,
+    ) {
+        if let Some(formatter) = formatter {
+            self.frame_count_prefix_formatter = formatter;
+        } else {
+            self.frame_count_prefix_formatter = default_frame_count_prefix_formatter;
+        }
+    }
+}
+
 impl Default for FrameCounterPrefixFormatter {
     fn default() -> Self {
         Self {
