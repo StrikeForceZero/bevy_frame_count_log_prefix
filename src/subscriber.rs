@@ -1,41 +1,44 @@
-use std::fmt;
-use std::fmt::Pointer;
-use std::io::Stderr;
-use std::sync::atomic::{AtomicU32, Ordering};
 
-use bevy::core::FrameCount;
+
+use std::io::{stderr};
+
+
+
+
 use bevy::log::{BoxedSubscriber, LogPlugin};
 use bevy::prelude::*;
-use bevy::utils::tracing;
-use bevy::utils::tracing::{Metadata, Subscriber};
-use tracing::instrument::WithSubscriber;
-use tracing_log::LogTracer;
-use tracing_subscriber::{EnvFilter, Layer, Registry};
-use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
-use tracing_subscriber::fmt::format::DefaultFields;
-use tracing_subscriber::layer::{Context, SubscriberExt};
-use tracing_subscriber::registry::LookupSpan;
+use bevy::utils::tracing::{Subscriber};
 
-use crate::cache_system::cache_frame_count;
+use tracing_log::LogTracer;
+
+
+use tracing_subscriber::layer::{SubscriberExt};
+use tracing_subscriber::registry::LookupSpan;
+use tracing_subscriber::{EnvFilter, Layer, Registry};
+
+
 use crate::config::FrameCountSubscriberConfig;
 use crate::formatter::FrameCounterPrefixFormatter;
 
-pub fn update_subscriber(subscriber: BoxedSubscriber) -> BoxedSubscriber
-{
+pub fn update_subscriber(subscriber: BoxedSubscriber) -> BoxedSubscriber {
     Box::new(subscriber.with(create_layer(None)))
 }
 
-fn create_layer(config: Option<&FrameCountSubscriberConfig>) -> Box<tracing_subscriber::fmt::Layer<(), DefaultFields, FrameCounterPrefixFormatter, fn() -> Stderr>> {
-    Box::new(tracing_subscriber::fmt::Layer::default()
+fn create_layer<S: Subscriber + for<'a> LookupSpan<'a>>(
+    config: Option<&FrameCountSubscriberConfig>,
+) -> impl Layer<S> {
+    tracing_subscriber::fmt::Layer::default()
         .event_format(create_filter(config))
-        .with_writer(std::io::stderr))
+        .with_writer(stderr)
 }
 
 fn create_filter_from_app(app: &App) -> FrameCounterPrefixFormatter {
     create_filter(app.world.get_resource::<FrameCountSubscriberConfig>())
 }
 
-pub(crate) fn create_filter(config: Option<&FrameCountSubscriberConfig>) -> FrameCounterPrefixFormatter {
+pub(crate) fn create_filter(
+    config: Option<&FrameCountSubscriberConfig>,
+) -> FrameCounterPrefixFormatter {
     let mut frame_counter_prefix_formatter = FrameCounterPrefixFormatter::default();
     if let Some(config) = config {
         frame_counter_prefix_formatter

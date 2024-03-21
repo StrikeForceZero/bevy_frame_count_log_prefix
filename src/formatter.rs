@@ -1,5 +1,4 @@
 use crate::statics::get_frame_count;
-use bevy::utils::tracing;
 use bevy::utils::tracing::Subscriber;
 use std::fmt;
 use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
