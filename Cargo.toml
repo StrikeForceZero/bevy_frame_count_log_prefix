@@ -1,3 +1,4 @@
+workspace = { members = ["examples/example"] }
 [package]
 name = "bevy_frame_count_subscriber"
 version = "0.1.0"
@@ -10,6 +11,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 tracing-subscriber = "0.3"
 tracing-log = "0.2"
+tracing = "0.1"
 
 [dependencies.bevy]
 version = "0.13"

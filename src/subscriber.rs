@@ -1,18 +1,48 @@
+use std::fmt;
+use std::fmt::Pointer;
+use std::io::Stderr;
+use std::sync::atomic::{AtomicU32, Ordering};
+
+use bevy::core::FrameCount;
+use bevy::log::{BoxedSubscriber, LogPlugin};
+use bevy::prelude::*;
+use bevy::utils::tracing;
+use bevy::utils::tracing::{Metadata, Subscriber};
+use tracing::instrument::WithSubscriber;
+use tracing_log::LogTracer;
+use tracing_subscriber::{EnvFilter, Layer, Registry};
+use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
+use tracing_subscriber::fmt::format::DefaultFields;
+use tracing_subscriber::layer::{Context, SubscriberExt};
+use tracing_subscriber::registry::LookupSpan;
+
 use crate::cache_system::cache_frame_count;
 use crate::config::FrameCountSubscriberConfig;
 use crate::formatter::FrameCounterPrefixFormatter;
-use bevy::core::FrameCount;
-use bevy::log::LogPlugin;
-use bevy::prelude::*;
-use bevy::utils::tracing;
-use bevy::utils::tracing::Subscriber;
-use std::fmt;
-use std::sync::atomic::{AtomicU32, Ordering};
-use tracing_log::LogTracer;
-use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::registry::LookupSpan;
-use tracing_subscriber::{EnvFilter, Registry};
+
+pub fn update_subscriber(subscriber: BoxedSubscriber) -> BoxedSubscriber
+{
+    Box::new(subscriber.with(create_layer(None)))
+}
+
+fn create_layer(config: Option<&FrameCountSubscriberConfig>) -> Box<tracing_subscriber::fmt::Layer<(), DefaultFields, FrameCounterPrefixFormatter, fn() -> Stderr>> {
+    Box::new(tracing_subscriber::fmt::Layer::default()
+        .event_format(create_filter(config))
+        .with_writer(std::io::stderr))
+}
+
+fn create_filter_from_app(app: &App) -> FrameCounterPrefixFormatter {
+    create_filter(app.world.get_resource::<FrameCountSubscriberConfig>())
+}
+
+pub(crate) fn create_filter(config: Option<&FrameCountSubscriberConfig>) -> FrameCounterPrefixFormatter {
+    let mut frame_counter_prefix_formatter = FrameCounterPrefixFormatter::default();
+    if let Some(config) = config {
+        frame_counter_prefix_formatter
+            .set_frame_count_prefix_formatter(config.get_frame_count_prefix_formatter());
+    }
+    frame_counter_prefix_formatter
+}
 
 pub(crate) fn register_subscriber(config: Option<&FrameCountSubscriberConfig>) {
     /// derived from https://github.com/bevyengine/bevy/blob/dedf66f72bd8659b744e12b341a7f8de4ed8ba17/crates/bevy_log/src/lib.rs#L129-L228 (MIT/APACHE)
@@ -27,13 +57,8 @@ pub(crate) fn register_subscriber(config: Option<&FrameCountSubscriberConfig>) {
     let subscriber = Registry::default().with(filter_layer);
 
     // create format layer and replace event_formatter with frame count injector
-    let mut frame_counter_prefix_formatter = FrameCounterPrefixFormatter::default();
-    if let Some(config) = config {
-        frame_counter_prefix_formatter
-            .set_frame_count_prefix_formatter(config.get_frame_count_prefix_formatter());
-    }
     let fmt_layer = tracing_subscriber::fmt::Layer::default()
-        .event_format(frame_counter_prefix_formatter)
+        .event_format(create_filter(config))
         .with_writer(std::io::stderr);
 
     let subscriber = subscriber.with(fmt_layer);
