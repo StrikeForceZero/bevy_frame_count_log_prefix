@@ -1,8 +1,10 @@
-use crate::statics::get_frame_count;
-use bevy::utils::tracing::Subscriber;
 use std::fmt;
-use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
+
+use bevy::utils::tracing::Subscriber;
+use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
+
+use crate::statics::get_frame_count;
 
 pub(crate) fn default_frame_count_prefix_formatter(frame_count: u32) -> String {
     format!("[frame:{frame_count}] ")
@@ -38,15 +40,15 @@ impl Default for FrameCounterPrefixFormatter {
 }
 
 impl<S, N> FormatEvent<S, N> for FrameCounterPrefixFormatter
-where
-    S: Subscriber + for<'a> LookupSpan<'a>,
-    N: for<'a> FormatFields<'a> + 'static,
+    where
+        S: Subscriber + for<'a> LookupSpan<'a>,
+        N: for<'a> FormatFields<'a> + 'static,
 {
     fn format_event(
         &self,
-        ctx: &FmtContext<'_, S, N>,
+        _ctx: &FmtContext<'_, S, N>,
         mut writer: format::Writer<'_>,
-        event: &tracing::Event<'_>,
+        _event: &tracing::Event<'_>,
     ) -> fmt::Result {
         // Write the prefix before the rest of the event
         write!(
@@ -56,7 +58,7 @@ where
         )?;
         // Use the default event formatter for the rest
         // ctx.field_format().format_fields(writer.by_ref(), event)?;
-        self.main_formatter.format_event(ctx, writer, event)?;
+        // self.main_formatter.format_event(ctx, writer, event)?;
         Ok(())
     }
 }

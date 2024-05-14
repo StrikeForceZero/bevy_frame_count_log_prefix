@@ -14,5 +14,6 @@ tracing-log = "0.2"
 tracing = "0.1"
 
 [dependencies.bevy]
-version = "0.13"
+git = "https://github.com/bevyengine/bevy.git"
+rev = "519ed5de42c9d872299a9b8b01933e052bf55595"
 default-features = false

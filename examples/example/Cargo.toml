@@ -6,8 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.13"
 tracing-log = "0.2"
 
 [dependencies.bevy_frame_count_subscriber]
 path = "../.."
+
+[dependencies.bevy]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "519ed5de42c9d872299a9b8b01933e052bf55595"
+default-features = false
