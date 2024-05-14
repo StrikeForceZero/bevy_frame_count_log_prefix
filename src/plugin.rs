@@ -12,7 +12,8 @@ impl Plugin for FrameCountSubscriberPlugin {
         app.add_systems(First, cache_frame_count)
             .init_resource::<FrameCountSubscriberConfig>();
         if !app.get_added_plugins::<LogPlugin>().is_empty() {
-            panic!("LogPlugin already loaded, please disable with `.add_plugins(DefaultPlugins.build().disable::<LogPlugin>())` before loading FrameCountSubscriberPlugin");
+            panic!("LogPlugin already loaded, please disable with `.add_plugins(DefaultPlugins.build().disable::<LogPlugin>())` before loading FrameCountSubscriberPlugin, \
+             or add the layer manually `LogPlugin {{ custom_layer: |app| Some(Box::new(vec![/* ..other layers here, */ bevy_frame_count_subscriber::subscriber::frame_count_layer(app))) }}`");
         }
         if !app.get_added_plugins::<FrameCountSubscriberPlugin>().is_empty() {
             panic!("FrameCountSubscriberPlugin already loaded");
