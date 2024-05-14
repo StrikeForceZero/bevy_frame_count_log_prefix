@@ -20,14 +20,18 @@ pub(crate) fn create_filter(
     frame_counter_prefix_formatter
 }
 
-fn custom_layer(app: &mut App) -> Option<BoxedLayer> {    // create format layer and replace event_formatter with frame count injector
-    let fmt_layer = tracing_subscriber::fmt::Layer::default()
+pub fn frame_count_layer(app: &mut App) -> BoxedLayer {
+    // create format layer and replace event_formatter with frame count injector
+    tracing_subscriber::fmt::Layer::default()
         .event_format(create_filter_from_app(app))
-        .with_writer(std::io::stderr);
+        .with_writer(std::io::stderr)
+        .boxed()
+}
 
+fn custom_layer(app: &mut App) -> Option<BoxedLayer> {
     Some(Box::new(vec![
         /* rustfmt multi line */
-        fmt_layer.boxed(),
+        frame_count_layer(app),
     ]))
 }
 
