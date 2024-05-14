@@ -3,4 +3,4 @@ mod config;
 mod formatter;
 pub mod plugin;
 mod statics;
-mod subscriber;
+pub mod subscriber;
