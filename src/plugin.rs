@@ -3,7 +3,7 @@ use bevy::log::LogPlugin;
 
 use crate::cache_system::cache_frame_count;
 use crate::config::FrameCountSubscriberConfig;
-use crate::subscriber::add_log_plugin_with_custom_layer;
+use crate::subscriber_layer::add_log_plugin_with_custom_layer;
 
 pub struct FrameCountSubscriberPlugin;
 
