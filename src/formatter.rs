@@ -17,6 +17,14 @@ pub trait FormatFrameCount {
     fn write(&self, f: &mut Formatter<'_>, frame_count: u32) -> fmt::Result;
 }
 
+impl<T: FormatFrameCount + Send + Sync + 'static> From<T> for FrameCountFormatter {
+    fn from(value: T) -> Self {
+        Self {
+            formatter: Some(Arc::new(value)),
+        }
+    }
+}
+
 pub(crate) fn default_frame_count_formatter(frame_count: u32) -> impl Display {
     struct DefaultFormatFrameCountForwarder {
         frame_count: u32,

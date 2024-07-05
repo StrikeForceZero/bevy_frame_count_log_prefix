@@ -72,7 +72,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.build().disable::<LogPlugin>())
         .insert_resource(FrameCountLogPrefixConfig {
-            formatter: FrameCountFormatter::new(CustomFormatter)
+            formatter: CustomFormatter.into(),
         })
         .add_plugins(FrameCountLogPrefixPlugin)
         .add_systems(Update, || info!("test"))
