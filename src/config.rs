@@ -4,7 +4,7 @@ use crate::formatter::FrameCounterPrefixFormatter;
 
 #[derive(Debug, Default, Resource)]
 pub struct FrameCountSubscriberConfig {
-    frame_count_prefix_formatter: FrameCounterPrefixFormatter,
+    pub frame_count_prefix_formatter: FrameCounterPrefixFormatter,
 }
 
 impl FrameCountSubscriberConfig {
