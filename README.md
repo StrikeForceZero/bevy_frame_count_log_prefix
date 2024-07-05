@@ -50,3 +50,36 @@ fn main() {
 }
 ```
 
+### Custom Formatter
+
+```rust
+use bevy::log::LogPlugin;
+use bevy::prelude::*;
+
+use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixPlugin;
+use bevy_frame_count_log_prefix::config::FrameCountLogPrefixConfig;
+use bevy_frame_count_log_prefix::formatter::{FrameCountFormatter, FormatFrameCount};
+
+struct CustomFormatter;
+
+impl FormatFrameCount for CustomFormatter {
+    fn debug_name(&self) -> &'static str {
+        "CustomFormatter"
+    }
+    fn write(&self, f: &mut Formatter<'_>, frame_count: u32) -> std::fmt::Result {
+        write!(f, "{frame_count} ")
+    }
+}
+
+fn main() {
+    App::new()
+        .add_plugins(DefaultPlugins.build().disable::<LogPlugin>())
+        .insert_resource(FrameCountLogPrefixConfig {
+            formatter: FrameCountFormatter::new(CustomFormatter)
+        })
+        .add_plugins(FrameCountLogPrefixPlugin)
+        .add_systems(Update, || info!("test"))
+        .run()
+    ;
+}
+```
