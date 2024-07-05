@@ -1,4 +1,4 @@
-# Bevy Frame Count Subscriber
+# Bevy Frame Count Log Prefix
 
 ## Features
 
@@ -12,12 +12,12 @@ Adds prefix to all log messages with the current frame count. This is useful in 
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_subscriber::plugin::FrameCountSubscriberPlugin;
+use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixPlugin;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.build().disable::<LogPlugin>())
-        .add_plugins(FrameCountSubscriberPlugin)
+        .add_plugins(FrameCountLogPrefixPlugin)
         .add_systems(Update, || info!("test"))
         .run()
     ;
@@ -30,8 +30,8 @@ fn main() {
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_subscriber::plugin::FrameCountSubscriberPluginManual;
-use bevy_frame_count_subscriber::subscriber_layer::frame_count_layer;
+use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixManualPlugin;
+use bevy_frame_count_log_prefix::subscriber_layer::frame_count_layer;
 
 fn main() {
     App::new()
@@ -43,7 +43,7 @@ fn main() {
                 ]))
             },
         }))
-        .add_plugins(FrameCountSubscriberPluginManual)
+        .add_plugins(FrameCountLogPrefixManualPlugin)
         .add_systems(Update, || info!("test"))
         .run()
     ;
