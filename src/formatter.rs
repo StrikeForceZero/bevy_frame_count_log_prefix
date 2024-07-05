@@ -17,7 +17,7 @@ pub trait FormatFrameCount {
     fn write(&self, f: &mut Formatter<'_>, frame_count: u32) -> fmt::Result;
 }
 
-pub(crate) fn default_frame_count_prefix_formatter(frame_count: u32) -> impl Display {
+pub(crate) fn default_frame_count_formatter(frame_count: u32) -> impl Display {
     struct DefaultFormatFrameCountForwarder {
         frame_count: u32,
     }
@@ -31,17 +31,17 @@ pub(crate) fn default_frame_count_prefix_formatter(frame_count: u32) -> impl Dis
     DefaultFormatFrameCountForwarder { frame_count }
 }
 
-pub const DEFAULT_FRAME_COUNTER_PREFIX_FORMATTER: FrameCounterPrefixFormatter =
-    FrameCounterPrefixFormatter {
+pub const DEFAULT_FRAME_COUNT_FORMATTER: FrameCountFormatter =
+    FrameCountFormatter {
         formatter: None,
     };
 
 #[derive(Default, Clone)]
-pub struct FrameCounterPrefixFormatter {
+pub struct FrameCountFormatter {
     formatter: Option<Arc<dyn FormatFrameCount + Send + Sync>>,
 }
 
-impl Debug for FrameCounterPrefixFormatter {
+impl Debug for FrameCountFormatter {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut d = f.debug_struct("FrameCounterPrefixFormatter");
         if let Some(formatter) = &self.formatter {
@@ -52,7 +52,7 @@ impl Debug for FrameCounterPrefixFormatter {
     }
 }
 
-impl FrameCounterPrefixFormatter {
+impl FrameCountFormatter {
     pub fn new(formatter: impl FormatFrameCount + Send + Sync + 'static) -> Self {
         Self {
             formatter: Some(Arc::new(formatter)),
@@ -66,7 +66,7 @@ impl FrameCounterPrefixFormatter {
     }
 }
 
-impl<S, N> FormatEvent<S, N> for FrameCounterPrefixFormatter
+impl<S, N> FormatEvent<S, N> for FrameCountFormatter
 where
     S: Subscriber + for<'a> LookupSpan<'a>,
     N: for<'a> FormatFields<'a> + 'static,
@@ -102,7 +102,7 @@ where
             write!(
                 writer,
                 "{}",
-                default_frame_count_prefix_formatter(get_frame_count())
+                default_frame_count_formatter(get_frame_count())
             )
         }
     }

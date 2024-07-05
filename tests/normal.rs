@@ -6,7 +6,7 @@ use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
 use bevy_frame_count_subscriber::config::FrameCountSubscriberConfig;
-use bevy_frame_count_subscriber::formatter::{FormatFrameCount, FrameCounterPrefixFormatter};
+use bevy_frame_count_subscriber::formatter::{FormatFrameCount, FrameCountFormatter};
 use bevy_frame_count_subscriber::plugin::FrameCountSubscriberPlugin;
 
 #[test]
@@ -28,7 +28,7 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(DefaultPlugins.build().disable::<LogPlugin>())
         .insert_resource(FrameCountSubscriberConfig {
-            formatter: FrameCounterPrefixFormatter::new(TestFormatter),
+            formatter: FrameCountFormatter::new(TestFormatter),
         })
         .add_plugins(FrameCountSubscriberPlugin);
     // using error! to be captured by env filter

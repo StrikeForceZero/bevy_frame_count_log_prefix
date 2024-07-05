@@ -6,7 +6,7 @@ use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
 use bevy_frame_count_subscriber::config::FrameCountSubscriberConfig;
-use bevy_frame_count_subscriber::formatter::{FormatFrameCount, FrameCounterPrefixFormatter};
+use bevy_frame_count_subscriber::formatter::{FormatFrameCount, FrameCountFormatter};
 use bevy_frame_count_subscriber::plugin::FrameCountSubscriberPluginManual;
 use bevy_frame_count_subscriber::subscriber_layer::frame_count_layer;
 
@@ -28,7 +28,7 @@ fn main() {
 
     let mut app = App::new();
     app.insert_resource(FrameCountSubscriberConfig {
-        formatter: FrameCounterPrefixFormatter::new(TestFormatter),
+        formatter: FrameCountFormatter::new(TestFormatter),
     })
         .add_plugins(FrameCountSubscriberPluginManual)
         .add_plugins(DefaultPlugins.build().set(LogPlugin {

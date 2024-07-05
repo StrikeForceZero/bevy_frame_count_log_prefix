@@ -3,19 +3,19 @@ use bevy::prelude::*;
 use tracing_subscriber::Layer;
 
 use crate::config::FrameCountSubscriberConfig;
-use crate::formatter::{FrameCounterPrefixFormatter, DEFAULT_FRAME_COUNTER_PREFIX_FORMATTER};
+use crate::formatter::{DEFAULT_FRAME_COUNT_FORMATTER, FrameCountFormatter};
 
-pub(crate) fn create_filter_from_app(app: &App) -> FrameCounterPrefixFormatter {
+pub(crate) fn create_filter_from_app(app: &App) -> FrameCountFormatter {
     create_filter(app.world().get_resource::<FrameCountSubscriberConfig>())
 }
 
 pub(crate) fn create_filter(
     config: Option<&FrameCountSubscriberConfig>,
-) -> FrameCounterPrefixFormatter {
+) -> FrameCountFormatter {
     if let Some(config) = config {
         config.get_frame_count_prefix_formatter().clone()
     } else {
-        DEFAULT_FRAME_COUNTER_PREFIX_FORMATTER
+        DEFAULT_FRAME_COUNT_FORMATTER
     }
 }
 
