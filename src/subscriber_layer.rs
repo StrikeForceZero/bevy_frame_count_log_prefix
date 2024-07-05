@@ -13,7 +13,7 @@ pub(crate) fn create_filter(
     config: Option<&FrameCountLogPrefixConfig>,
 ) -> FrameCountFormatter {
     if let Some(config) = config {
-        config.get_frame_count_prefix_formatter().clone()
+        config.formatter.clone()
     } else {
         DEFAULT_FRAME_COUNT_FORMATTER
     }

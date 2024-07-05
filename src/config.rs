@@ -6,9 +6,3 @@ use crate::formatter::FrameCountFormatter;
 pub struct FrameCountLogPrefixConfig {
     pub formatter: FrameCountFormatter,
 }
-
-impl FrameCountLogPrefixConfig {
-    pub fn get_frame_count_prefix_formatter(&self) -> &FrameCountFormatter {
-        &self.formatter
-    }
-}
