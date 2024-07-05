@@ -4,7 +4,7 @@ use std::fmt::{Debug, Display, Formatter};
 use std::sync::Arc;
 
 use bevy::utils::tracing::Subscriber;
-use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
+use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
 
 use crate::statics::get_frame_count;
