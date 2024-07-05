@@ -58,12 +58,6 @@ impl FrameCountFormatter {
             formatter: Some(Arc::new(formatter)),
         }
     }
-    pub fn set_frame_count_prefix_formatter(
-        &mut self,
-        formatter: Option<impl FormatFrameCount + Send + Sync + 'static>,
-    ) {
-        self.formatter = formatter.map(Arc::new).map(|param| param as _);
-    }
 }
 
 impl<S, N> FormatEvent<S, N> for FrameCountFormatter
