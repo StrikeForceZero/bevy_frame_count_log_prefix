@@ -5,9 +5,7 @@ use bevy::ecs::system::RunSystemOnce;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_log_prefix::config::FrameCountLogPrefixConfig;
-use bevy_frame_count_log_prefix::formatter::{FormatFrameCount, FrameCountFormatter};
-use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixPlugin;
+use bevy_frame_count_log_prefix::prelude::*;
 
 #[test]
 fn main() {

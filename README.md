@@ -12,7 +12,7 @@ Adds prefix to all log messages with the current frame count. This is useful in 
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixPlugin;
+use bevy_frame_count_log_prefix::prelude::*;
 
 fn main() {
     App::new()
@@ -30,8 +30,7 @@ fn main() {
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixManualPlugin;
-use bevy_frame_count_log_prefix::subscriber_layer::frame_count_layer;
+use bevy_frame_count_log_prefix::prelude::*;
 
 fn main() {
     App::new()
@@ -56,9 +55,7 @@ fn main() {
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixPlugin;
-use bevy_frame_count_log_prefix::config::FrameCountLogPrefixConfig;
-use bevy_frame_count_log_prefix::formatter::{FrameCountFormatter, FormatFrameCount};
+use bevy_frame_count_log_prefix::prelude::*;
 
 struct CustomFormatter;
 
