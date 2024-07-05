@@ -1,5 +1,5 @@
 [package]
-name = "bevy_frame_count_subscriber"
+name = "bevy_frame_count_log_prefix"
 version = "0.0.0"
 authors = ["Brett Striker <strikeforcezero@gmail.com>"]
 edition = "2021"

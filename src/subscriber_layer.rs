@@ -2,15 +2,15 @@ use bevy::log::{BoxedLayer, LogPlugin};
 use bevy::prelude::*;
 use tracing_subscriber::Layer;
 
-use crate::config::FrameCountSubscriberConfig;
+use crate::config::FrameCountLogPrefixConfig;
 use crate::formatter::{DEFAULT_FRAME_COUNT_FORMATTER, FrameCountFormatter};
 
 pub(crate) fn create_filter_from_app(app: &App) -> FrameCountFormatter {
-    create_filter(app.world().get_resource::<FrameCountSubscriberConfig>())
+    create_filter(app.world().get_resource::<FrameCountLogPrefixConfig>())
 }
 
 pub(crate) fn create_filter(
-    config: Option<&FrameCountSubscriberConfig>,
+    config: Option<&FrameCountLogPrefixConfig>,
 ) -> FrameCountFormatter {
     if let Some(config) = config {
         config.get_frame_count_prefix_formatter().clone()

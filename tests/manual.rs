@@ -5,10 +5,10 @@ use bevy::ecs::system::RunSystemOnce;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
-use bevy_frame_count_subscriber::config::FrameCountSubscriberConfig;
-use bevy_frame_count_subscriber::formatter::{FormatFrameCount, FrameCountFormatter};
-use bevy_frame_count_subscriber::plugin::FrameCountSubscriberPluginManual;
-use bevy_frame_count_subscriber::subscriber_layer::frame_count_layer;
+use bevy_frame_count_log_prefix::config::FrameCountLogPrefixConfig;
+use bevy_frame_count_log_prefix::formatter::{FormatFrameCount, FrameCountFormatter};
+use bevy_frame_count_log_prefix::plugin::FrameCountLogPrefixManualPlugin;
+use bevy_frame_count_log_prefix::subscriber_layer::frame_count_layer;
 
 #[test]
 fn main() {
@@ -27,10 +27,10 @@ fn main() {
     }
 
     let mut app = App::new();
-    app.insert_resource(FrameCountSubscriberConfig {
+    app.insert_resource(FrameCountLogPrefixConfig {
         formatter: FrameCountFormatter::new(TestFormatter),
     })
-        .add_plugins(FrameCountSubscriberPluginManual)
+        .add_plugins(FrameCountLogPrefixManualPlugin)
         .add_plugins(DefaultPlugins.build().set(LogPlugin {
             custom_layer: |app| Some(Box::new(vec![frame_count_layer(app)])),
             ..default()
