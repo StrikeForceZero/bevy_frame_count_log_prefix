@@ -1,39 +1,62 @@
-use std::fmt;
-
 use bevy::utils::tracing::Subscriber;
+use std::any::type_name;
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter};
+use std::sync::Arc;
 use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
 
 use crate::statics::get_frame_count;
 
-pub(crate) fn default_frame_count_prefix_formatter(frame_count: u32) -> String {
-    format!("[frame:{frame_count}] ")
+pub trait FormatFrameCount {
+    fn debug_name(&self) -> &'static str {
+        type_name::<Self>()
+    }
+
+    fn write(&self, f: &mut Formatter<'_>, frame_count: u32) -> fmt::Result;
 }
 
-pub type FrameCountPrefixFormatter = fn(count: u32) -> String;
+pub(crate) fn default_frame_count_prefix_formatter(frame_count: u32) -> impl Display {
+    struct DefaultFormatFrameCountForwarder {
+        frame_count: u32,
+    }
 
+    impl Display for DefaultFormatFrameCountForwarder {
+        fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+            write!(f, "[frame:{}] ", self.frame_count)
+        }
+    }
+
+    DefaultFormatFrameCountForwarder { frame_count }
+}
+
+pub const DEFAULT_FRAME_COUNTER_PREFIX_FORMATTER: FrameCounterPrefixFormatter =
+    FrameCounterPrefixFormatter {
+        frame_count_prefix_formatter: None,
+    };
+
+#[derive(Default, Clone)]
 pub(crate) struct FrameCounterPrefixFormatter {
-    frame_count_prefix_formatter: FrameCountPrefixFormatter,
+    frame_count_prefix_formatter: Option<Arc<dyn FormatFrameCount + Send + Sync>>,
+}
+
+impl Debug for FrameCounterPrefixFormatter {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let mut d = f.debug_struct("FrameCounterPrefixFormatter");
+        if let Some(formatter) = &self.frame_count_prefix_formatter {
+            d.field("formatter", &formatter.debug_name()).finish()
+        } else {
+            d.finish_non_exhaustive()
+        }
+    }
 }
 
 impl FrameCounterPrefixFormatter {
     pub(crate) fn set_frame_count_prefix_formatter(
         &mut self,
-        formatter: Option<FrameCountPrefixFormatter>,
+        formatter: Option<impl FormatFrameCount + Send + Sync + 'static>,
     ) {
-        if let Some(formatter) = formatter {
-            self.frame_count_prefix_formatter = formatter;
-        } else {
-            self.frame_count_prefix_formatter = default_frame_count_prefix_formatter;
-        }
-    }
-}
-
-impl Default for FrameCounterPrefixFormatter {
-    fn default() -> Self {
-        Self {
-            frame_count_prefix_formatter: default_frame_count_prefix_formatter,
-        }
+        self.frame_count_prefix_formatter = formatter.map(Arc::new).map(|param| param as _);
     }
 }
 
@@ -49,10 +72,32 @@ where
         _event: &tracing::Event<'_>,
     ) -> fmt::Result {
         // Write the prefix before the rest of the event
-        write!(
-            writer,
-            "{}",
-            (self.frame_count_prefix_formatter)(get_frame_count())
-        )
+        if let Some(formatter) = &self.frame_count_prefix_formatter {
+            struct DynFormatFrameCountForwarder<'a> {
+                frame_count: u32,
+                formatter: &'a dyn FormatFrameCount,
+            }
+
+            impl Display for DynFormatFrameCountForwarder<'_> {
+                fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+                    self.formatter.write(f, self.frame_count)
+                }
+            }
+
+            write!(
+                writer,
+                "{}",
+                DynFormatFrameCountForwarder {
+                    frame_count: get_frame_count(),
+                    formatter: &**formatter,
+                }
+            )
+        } else {
+            write!(
+                writer,
+                "{}",
+                default_frame_count_prefix_formatter(get_frame_count())
+            )
+        }
     }
 }
