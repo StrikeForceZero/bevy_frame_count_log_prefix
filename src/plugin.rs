@@ -36,3 +36,28 @@ impl Plugin for FrameCountSubscriberPluginManual {
         init(app);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use bevy::prelude::*;
+
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn log_plugin_already_added() {
+        App::new()
+            .add_plugins(DefaultPlugins)
+            .add_plugins(FrameCountSubscriberPlugin)
+            .run();
+    }
+
+    #[test]
+    #[should_panic]
+    fn this_plugin_already_added() {
+        App::new()
+            .add_plugins(FrameCountSubscriberPlugin)
+            .add_plugins(FrameCountSubscriberPlugin)
+            .run();
+    }
+}
