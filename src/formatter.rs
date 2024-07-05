@@ -1,7 +1,7 @@
 use std::fmt;
 
 use bevy::utils::tracing::Subscriber;
-use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
+use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
 
 use crate::statics::get_frame_count;
@@ -40,9 +40,9 @@ impl Default for FrameCounterPrefixFormatter {
 }
 
 impl<S, N> FormatEvent<S, N> for FrameCounterPrefixFormatter
-    where
-        S: Subscriber + for<'a> LookupSpan<'a>,
-        N: for<'a> FormatFields<'a> + 'static,
+where
+    S: Subscriber + for<'a> LookupSpan<'a>,
+    N: for<'a> FormatFields<'a> + 'static,
 {
     fn format_event(
         &self,
