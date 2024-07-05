@@ -4,7 +4,7 @@ use std::fmt::{Debug, Display, Formatter};
 use std::sync::Arc;
 
 use bevy::utils::tracing::Subscriber;
-use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
+use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
 
 use crate::statics::get_frame_count;
@@ -33,18 +33,18 @@ pub(crate) fn default_frame_count_prefix_formatter(frame_count: u32) -> impl Dis
 
 pub const DEFAULT_FRAME_COUNTER_PREFIX_FORMATTER: FrameCounterPrefixFormatter =
     FrameCounterPrefixFormatter {
-        frame_count_prefix_formatter: None,
+        formatter: None,
     };
 
 #[derive(Default, Clone)]
 pub struct FrameCounterPrefixFormatter {
-    frame_count_prefix_formatter: Option<Arc<dyn FormatFrameCount + Send + Sync>>,
+    formatter: Option<Arc<dyn FormatFrameCount + Send + Sync>>,
 }
 
 impl Debug for FrameCounterPrefixFormatter {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut d = f.debug_struct("FrameCounterPrefixFormatter");
-        if let Some(formatter) = &self.frame_count_prefix_formatter {
+        if let Some(formatter) = &self.formatter {
             d.field("formatter", &formatter.debug_name()).finish()
         } else {
             d.finish_non_exhaustive()
@@ -55,14 +55,14 @@ impl Debug for FrameCounterPrefixFormatter {
 impl FrameCounterPrefixFormatter {
     pub fn new(formatter: impl FormatFrameCount + Send + Sync + 'static) -> Self {
         Self {
-            frame_count_prefix_formatter: Some(Arc::new(formatter)),
+            formatter: Some(Arc::new(formatter)),
         }
     }
     pub fn set_frame_count_prefix_formatter(
         &mut self,
         formatter: Option<impl FormatFrameCount + Send + Sync + 'static>,
     ) {
-        self.frame_count_prefix_formatter = formatter.map(Arc::new).map(|param| param as _);
+        self.formatter = formatter.map(Arc::new).map(|param| param as _);
     }
 }
 
@@ -78,7 +78,7 @@ where
         _event: &tracing::Event<'_>,
     ) -> fmt::Result {
         // Write the prefix before the rest of the event
-        if let Some(formatter) = &self.frame_count_prefix_formatter {
+        if let Some(formatter) = &self.formatter {
             struct DynFormatFrameCountForwarder<'a> {
                 frame_count: u32,
                 formatter: &'a dyn FormatFrameCount,

@@ -28,7 +28,7 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(DefaultPlugins.build().disable::<LogPlugin>())
         .insert_resource(FrameCountSubscriberConfig {
-            frame_count_prefix_formatter: FrameCounterPrefixFormatter::new(TestFormatter),
+            formatter: FrameCounterPrefixFormatter::new(TestFormatter),
         })
         .add_plugins(FrameCountSubscriberPlugin);
     // using error! to be captured by env filter

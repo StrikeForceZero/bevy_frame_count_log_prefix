@@ -28,13 +28,13 @@ fn main() {
 
     let mut app = App::new();
     app.insert_resource(FrameCountSubscriberConfig {
-        frame_count_prefix_formatter: FrameCounterPrefixFormatter::new(TestFormatter),
+        formatter: FrameCounterPrefixFormatter::new(TestFormatter),
     })
-    .add_plugins(FrameCountSubscriberPluginManual)
-    .add_plugins(DefaultPlugins.build().set(LogPlugin {
-        custom_layer: |app| Some(Box::new(vec![frame_count_layer(app)])),
-        ..default()
-    }));
+        .add_plugins(FrameCountSubscriberPluginManual)
+        .add_plugins(DefaultPlugins.build().set(LogPlugin {
+            custom_layer: |app| Some(Box::new(vec![frame_count_layer(app)])),
+            ..default()
+        }));
     // using error! to be captured by env filter
     app.world_mut().run_system_once(|| error!("test"));
     assert!(*WAS_WRITE_CALLED.read().unwrap(), "write was never called");
