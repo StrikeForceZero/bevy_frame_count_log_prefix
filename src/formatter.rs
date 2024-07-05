@@ -14,7 +14,6 @@ pub type FrameCountPrefixFormatter = fn(count: u32) -> String;
 
 pub(crate) struct FrameCounterPrefixFormatter {
     frame_count_prefix_formatter: FrameCountPrefixFormatter,
-    main_formatter: format::Format<format::Full>,
 }
 
 impl FrameCounterPrefixFormatter {
@@ -34,7 +33,6 @@ impl Default for FrameCounterPrefixFormatter {
     fn default() -> Self {
         Self {
             frame_count_prefix_formatter: default_frame_count_prefix_formatter,
-            main_formatter: format::Format::default(),
         }
     }
 }
@@ -55,10 +53,6 @@ where
             writer,
             "{}",
             (self.frame_count_prefix_formatter)(get_frame_count())
-        )?;
-        // Use the default event formatter for the rest
-        // ctx.field_format().format_fields(writer.by_ref(), event)?;
-        // self.main_formatter.format_event(ctx, writer, event)?;
-        Ok(())
+        )
     }
 }
