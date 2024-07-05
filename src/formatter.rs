@@ -1,9 +1,10 @@
-use bevy::utils::tracing::Subscriber;
 use std::any::type_name;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 use std::sync::Arc;
-use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
+
+use bevy::utils::tracing::Subscriber;
+use tracing_subscriber::fmt::{FmtContext, format, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
 
 use crate::statics::get_frame_count;
@@ -52,7 +53,12 @@ impl Debug for FrameCounterPrefixFormatter {
 }
 
 impl FrameCounterPrefixFormatter {
-    pub(crate) fn set_frame_count_prefix_formatter(
+    pub fn new(formatter: impl FormatFrameCount + Send + Sync + 'static) -> Self {
+        Self {
+            frame_count_prefix_formatter: Some(Arc::new(formatter)),
+        }
+    }
+    pub fn set_frame_count_prefix_formatter(
         &mut self,
         formatter: Option<impl FormatFrameCount + Send + Sync + 'static>,
     ) {
