@@ -36,7 +36,7 @@ pub const DEFAULT_FRAME_COUNTER_PREFIX_FORMATTER: FrameCounterPrefixFormatter =
     };
 
 #[derive(Default, Clone)]
-pub(crate) struct FrameCounterPrefixFormatter {
+pub struct FrameCounterPrefixFormatter {
     frame_count_prefix_formatter: Option<Arc<dyn FormatFrameCount + Send + Sync>>,
 }
 
