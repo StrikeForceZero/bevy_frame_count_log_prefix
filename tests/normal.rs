@@ -30,6 +30,6 @@ fn main() {
         })
         .add_plugins(FrameCountLogPrefixPlugin);
     // using error! to be captured by env filter
-    app.world_mut().run_system_once(|| error!("test"));
+    let _ = app.world_mut().run_system_once(|| error!("test"));
     assert!(*WAS_WRITE_CALLED.read().unwrap(), "write was never called");
 }
