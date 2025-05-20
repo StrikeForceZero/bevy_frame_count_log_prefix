@@ -1,5 +1,5 @@
-use bevy::app::{App, First, Plugin};
-use bevy::log::LogPlugin;
+use bevy_app::{App, First, Plugin};
+use bevy_log::LogPlugin;
 
 use crate::cache_system::cache_frame_count;
 use crate::config::FrameCountLogPrefixConfig;

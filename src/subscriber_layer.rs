@@ -1,9 +1,9 @@
-use bevy::log::{BoxedLayer, LogPlugin};
-use bevy::prelude::*;
+use bevy_app::prelude::*;
+use bevy_log::{BoxedLayer, LogPlugin};
 use tracing_subscriber::Layer;
 
 use crate::config::FrameCountLogPrefixConfig;
-use crate::formatter::{DEFAULT_FRAME_COUNT_FORMATTER, FrameCountFormatter};
+use crate::formatter::{FrameCountFormatter, DEFAULT_FRAME_COUNT_FORMATTER};
 
 pub(crate) fn create_filter_from_app(app: &App) -> FrameCountFormatter {
     create_filter(app.world().get_resource::<FrameCountLogPrefixConfig>())
@@ -37,6 +37,6 @@ fn custom_layer(app: &mut App) -> Option<BoxedLayer> {
 pub(crate) fn add_log_plugin_with_custom_layer(app: &mut App) -> &mut App {
     app.add_plugins(LogPlugin {
         custom_layer,
-        ..default()
+        ..Default::default()
     })
 }

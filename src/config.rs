@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy_ecs::prelude::Resource;
 
 use crate::formatter::FrameCountFormatter;
 
