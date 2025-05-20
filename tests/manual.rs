@@ -4,7 +4,6 @@ use std::sync::RwLock;
 use bevy::ecs::system::RunSystemOnce;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
-
 use bevy_frame_count_log_prefix::prelude::*;
 
 #[test]
@@ -17,9 +16,21 @@ fn main() {
         fn debug_name(&self) -> &'static str {
             "TestFormatter"
         }
-        fn write(&self, f: &mut Formatter<'_>, frame_count: u32) -> std::fmt::Result {
+        fn write(
+            &self,
+            f: &mut Formatter<'_>,
+            frame_count: u32,
+            #[cfg(feature = "fixed_update")] fixed_update_count: u32,
+        ) -> std::fmt::Result {
             *WAS_WRITE_CALLED.write().unwrap() = true;
-            write!(f, "{frame_count} ")
+            #[cfg(not(feature = "fixed_update"))]
+            {
+                write!(f, "{frame_count} ")
+            }
+            #[cfg(feature = "fixed_update")]
+            {
+                write!(f, "{frame_count} {fixed_update_count} ")
+            }
         }
     }
 

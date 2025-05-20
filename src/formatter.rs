@@ -7,6 +7,8 @@ use bevy_log::tracing::Subscriber;
 use tracing_subscriber::fmt::{format, FmtContext, FormatEvent, FormatFields};
 use tracing_subscriber::registry::LookupSpan;
 
+#[cfg(feature = "fixed_update")]
+use crate::statics::get_fixed_update_count;
 use crate::statics::get_frame_count;
 
 pub trait FormatFrameCount {
@@ -14,7 +16,12 @@ pub trait FormatFrameCount {
         type_name::<Self>()
     }
 
-    fn write(&self, f: &mut Formatter<'_>, frame_count: u32) -> fmt::Result;
+    fn write(
+        &self,
+        f: &mut Formatter<'_>,
+        frame_count: u32,
+        #[cfg(feature = "fixed_update")] fixed_update_count: u32,
+    ) -> fmt::Result;
 }
 
 impl<T: FormatFrameCount + Send + Sync + 'static> From<T> for FrameCountFormatter {
@@ -25,24 +32,42 @@ impl<T: FormatFrameCount + Send + Sync + 'static> From<T> for FrameCountFormatte
     }
 }
 
-pub(crate) fn default_frame_count_formatter(frame_count: u32) -> impl Display {
+pub(crate) fn default_frame_count_formatter(
+    frame_count: u32,
+    #[cfg(feature = "fixed_update")] fixed_update_count: u32,
+) -> impl Display {
     struct DefaultFormatFrameCountForwarder {
         frame_count: u32,
+        #[cfg(feature = "fixed_update")]
+        fixed_update_count: u32,
     }
 
     impl Display for DefaultFormatFrameCountForwarder {
         fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-            write!(f, "[frame:{}] ", self.frame_count)
+            #[cfg(not(feature = "fixed_update"))]
+            {
+                write!(f, "[frame:{}] ", self.frame_count)
+            }
+            #[cfg(feature = "fixed_update")]
+            {
+                write!(
+                    f,
+                    "[frame:{}][fixed:{}] ",
+                    self.frame_count, self.fixed_update_count
+                )
+            }
         }
     }
 
-    DefaultFormatFrameCountForwarder { frame_count }
+    DefaultFormatFrameCountForwarder {
+        frame_count,
+        #[cfg(feature = "fixed_update")]
+        fixed_update_count,
+    }
 }
 
 pub const DEFAULT_FRAME_COUNT_FORMATTER: FrameCountFormatter =
-    FrameCountFormatter {
-        formatter: None,
-    };
+    FrameCountFormatter { formatter: None };
 
 #[derive(Default, Clone)]
 pub struct FrameCountFormatter {
@@ -83,12 +108,19 @@ where
         if let Some(formatter) = &self.formatter {
             struct DynFormatFrameCountForwarder<'a> {
                 frame_count: u32,
+                #[cfg(feature = "fixed_update")]
+                fixed_update_count: u32,
                 formatter: &'a dyn FormatFrameCount,
             }
 
             impl Display for DynFormatFrameCountForwarder<'_> {
                 fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-                    self.formatter.write(f, self.frame_count)
+                    self.formatter.write(
+                        f,
+                        self.frame_count,
+                        #[cfg(feature = "fixed_update")]
+                        self.fixed_update_count,
+                    )
                 }
             }
 
@@ -97,6 +129,8 @@ where
                 "{}",
                 DynFormatFrameCountForwarder {
                     frame_count: get_frame_count(),
+                    #[cfg(feature = "fixed_update")]
+                    fixed_update_count: get_fixed_update_count(),
                     formatter: &**formatter,
                 }
             )
@@ -104,7 +138,11 @@ where
             write!(
                 writer,
                 "{}",
-                default_frame_count_formatter(get_frame_count())
+                default_frame_count_formatter(
+                    get_frame_count(),
+                    #[cfg(feature = "fixed_update")]
+                    get_fixed_update_count()
+                )
             )
         }
     }

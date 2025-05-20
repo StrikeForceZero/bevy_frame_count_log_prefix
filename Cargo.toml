@@ -7,6 +7,9 @@ license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+fixed_update = []
+
 [dependencies]
 tracing-subscriber = "0.3"
 tracing-log = "0.2"

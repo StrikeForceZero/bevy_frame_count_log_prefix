@@ -1,13 +1,18 @@
+#[cfg(feature = "fixed_update")]
+use crate::cache_system::cache_fixed_update_count;
+use crate::cache_system::cache_frame_count;
+use crate::config::FrameCountLogPrefixConfig;
+#[cfg(feature = "fixed_update")]
+use crate::fixed_update_count::FixedUpdateCountPlugin;
+use crate::subscriber_layer::add_log_plugin_with_custom_layer;
 use bevy_app::{App, First, Plugin};
 use bevy_log::LogPlugin;
 
-use crate::cache_system::cache_frame_count;
-use crate::config::FrameCountLogPrefixConfig;
-use crate::subscriber_layer::add_log_plugin_with_custom_layer;
-
 fn init(app: &mut App) {
-    app.add_systems(First, cache_frame_count)
-        .init_resource::<FrameCountLogPrefixConfig>();
+    app.init_resource::<FrameCountLogPrefixConfig>();
+    app.add_systems(First, cache_frame_count);
+    #[cfg(feature = "fixed_update")]
+    app.add_systems(First, cache_fixed_update_count);
 }
 
 pub struct FrameCountLogPrefixPlugin;
@@ -24,6 +29,8 @@ impl Plugin for FrameCountLogPrefixPlugin {
         {
             panic!("FrameCountLogPrefixPlugin already loaded");
         }
+        #[cfg(feature = "fixed_update")]
+        app.add_plugins(FixedUpdateCountPlugin);
         init(app);
         add_log_plugin_with_custom_layer(app);
     }
